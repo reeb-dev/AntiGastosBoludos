@@ -2,9 +2,10 @@ package com.antigastos.boludos.domain
 
 import java.time.YearMonth
 import java.time.ZoneId
+import java.util.Locale
 
 fun YearMonth.toPeriodString(): String =
-    String.format("%04d-%02d", year, monthValue)
+    String.format(Locale.US, "%04d-%02d", year, monthValue)
 
 fun YearMonth.startEpochMillis(zone: ZoneId = ZoneId.systemDefault()): Long =
     atDay(1).atStartOfDay(zone).toInstant().toEpochMilli()

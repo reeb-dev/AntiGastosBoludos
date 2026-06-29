@@ -1,0 +1,34 @@
+# Gradle
+.gradle/
+build/
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+captures/
+
+# Builds
+app/build/
+app/release/
+
+# Firebase / Google Services (config con secretos del proyecto)
+app/google-services.json
+google-services.json
+functions/node_modules/
+functions/.env
+functions/.secret-*
+functions/apply-donation-config.sh
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+
+# Kotlin daemon
+.kotlin/
+
+# Logs locales
+firepit-log.txt

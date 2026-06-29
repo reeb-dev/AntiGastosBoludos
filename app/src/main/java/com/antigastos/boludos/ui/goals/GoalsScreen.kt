@@ -15,10 +15,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.antigastos.boludos.data.local.entity.CategoryEntity
 import com.antigastos.boludos.domain.MoneyFormat
 import com.antigastos.boludos.ui.MainViewModel
 import com.antigastos.boludos.ui.common.MonthSelector
@@ -47,9 +46,9 @@ fun GoalsScreen(
 
     var globalDigits by remember { mutableStateOf("") }
     var categoryDigits by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(value = false) }
     var selectedCategory by remember(categories) {
-        mutableStateOf<CategoryEntity?>(categories.firstOrNull())
+        mutableStateOf(categories.firstOrNull())
     }
 
     Column(
@@ -59,8 +58,6 @@ fun GoalsScreen(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text("Metas del mes", style = MaterialTheme.typography.headlineSmall)
-
         MonthSelector(
             yearMonth = month,
             onPrev = { mainViewModel.shiftMonth(-1) },
@@ -108,7 +105,7 @@ fun GoalsScreen(
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor(),
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable, enabled = true),
                     )
                     ExposedDropdownMenu(
                         expanded = expanded,
@@ -141,7 +138,7 @@ fun GoalsScreen(
                         categoryDigits = ""
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = selectedCategory != null && categoryDigits.toLongOrNull()?.let { it > 0 } == true,
+                    enabled = (selectedCategory != null) && (categoryDigits.toLongOrNull()?.let { it > 0 } == true),
                 ) {
                     Text("Guardar meta de categoría")
                 }

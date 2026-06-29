@@ -1,0 +1,20 @@
+# Copiá este archivo a `local.properties` (no se sube a git) y completá los valores.
+
+sdk.dir=/ruta/a/Android/sdk
+
+# APIs opcionales
+# GEMINI_API_KEY=
+# TENOR_API_KEY=
+# GIPHY_API_KEY=
+# KLIPY_API_KEY=
+
+# Donaciones por CBU (22 dígitos, sin espacios)
+DONATION_CBU=0000003100010000000000
+DONATION_HOLDER=Tu Nombre Apellido
+DONATION_ALIAS=tu.alias.mp
+
+# Firma release para Play Store (opcional en debug)
+# RELEASE_STORE_FILE=/ruta/a/tu-release.keystore
+# RELEASE_STORE_PASSWORD=
+# RELEASE_KEY_ALIAS=
+# RELEASE_KEY_PASSWORD=

@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.AntiGastosBoludos" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.AntiGastosBoludos.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#74ACDF</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_app</item>
+        <item name="postSplashScreenTheme">@style/Theme.AntiGastosBoludos</item>
+    </style>
 </resources>

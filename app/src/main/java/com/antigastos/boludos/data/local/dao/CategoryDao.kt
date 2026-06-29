@@ -1,9 +1,11 @@
 package com.antigastos.boludos.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.antigastos.boludos.data.local.entity.CategoryEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -11,6 +13,15 @@ import kotlinx.coroutines.flow.Flow
 interface CategoryDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(entities: List<CategoryEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(entity: CategoryEntity): Long
+
+    @Update
+    suspend fun update(entity: CategoryEntity)
+
+    @Delete
+    suspend fun delete(entity: CategoryEntity)
 
     @Query("SELECT COUNT(*) FROM categories")
     suspend fun count(): Long
@@ -23,4 +34,10 @@ interface CategoryDao {
 
     @Query("SELECT * FROM categories WHERE id = :id")
     suspend fun getById(id: Long): CategoryEntity?
+
+    @Query("SELECT * FROM categories WHERE slug = :slug LIMIT 1")
+    suspend fun getBySlug(slug: String): CategoryEntity?
+
+    @Query("DELETE FROM categories")
+    suspend fun clearAll()
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icono monocromo blanco requerido por Android 5+ para notificaciones.
+     El sistema lo tinta con el `setColor` del builder. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="#FFFFFF">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,2C10.34,2 9,3.34 9,5C9,5.18 9.02,5.36 9.05,5.54C6.69,6.4 5,8.51 5,11V17L3,19V20H21V19L19,17V11C19,8.51 17.31,6.4 14.95,5.54C14.98,5.36 15,5.18 15,5C15,3.34 13.66,2 12,2M12,4A1,1 0 0,1 13,5A1,1 0 0,1 12,6A1,1 0 0,1 11,5A1,1 0 0,1 12,4M10,21A2,2 0 0,0 12,23A2,2 0 0,0 14,21H10Z" />
+</vector>

@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class StatsViewModel(
     private val repository: com.antigastos.boludos.data.ExpenseRepository,
     mainViewModel: MainViewModel,

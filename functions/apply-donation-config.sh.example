@@ -1,0 +1,16 @@
+#!/bin/bash
+# Copiá a apply-donation-config.sh (está en .gitignore) y completá GMAIL_APP_PASS.
+# Ejecutá desde la raíz del proyecto:  bash functions/apply-donation-config.sh
+
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+: "${GMAIL_APP_PASS:?Definí GMAIL_APP_PASS con la contraseña de aplicación de 16 caracteres}"
+
+firebase functions:config:set \
+  enable.secret="${ENABLE_SECRET:-AntiGastosDonationEnableSecret2026}" \
+  admin.email="jesusseep@gmail.com" \
+  gmail.user="jesusseep@gmail.com" \
+  gmail.pass="${GMAIL_APP_PASS}"
+
+echo "OK. Ahora: firebase deploy --only functions"

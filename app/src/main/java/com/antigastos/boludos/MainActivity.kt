@@ -1,194 +1,121 @@
 package com.antigastos.boludos
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Flag
-import androidx.compose.material.icons.filled.FormatListBulleted
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
+import com.antigastos.boludos.notifications.Notifier
+import com.antigastos.boludos.notifications.StreakStatusNotifier
+import com.antigastos.boludos.ui.AppRoot
 import com.antigastos.boludos.ui.MainViewModel
-import com.antigastos.boludos.ui.editor.ExpenseEditorScreen
-import com.antigastos.boludos.ui.editor.ExpenseEditorViewModel
-import com.antigastos.boludos.ui.goals.GoalsScreen
-import com.antigastos.boludos.ui.goals.GoalsViewModel
-import com.antigastos.boludos.ui.home.HomeScreen
-import com.antigastos.boludos.ui.home.HomeViewModel
-import com.antigastos.boludos.ui.list.ExpenseListScreen
-import com.antigastos.boludos.ui.list.ExpenseListViewModel
 import com.antigastos.boludos.ui.navigation.Routes
-import com.antigastos.boludos.ui.stats.StatsScreen
-import com.antigastos.boludos.ui.stats.StatsViewModel
-import com.antigastos.boludos.ui.theme.AntiGastosTheme
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+/**
+ * `MainActivity` ahora solo se ocupa del lifecycle de Android:
+ * permisos de notificación, deeplinks/intents, auto-lock por inactividad
+ * y montar `AppRoot` como contenido Compose.
+ *
+ * Toda la UI (splash, shell con NavHost, overlays) vive bajo
+ * `ui/AppRoot.kt` y `ui/AntiGastosApp.kt`.
+ */
+class MainActivity : FragmentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
 
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { /* el resultado no nos detiene; si no concede, las notis simplemente no salen */ }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        maybeRequestNotificationPermission()
+        consumeRouteIntent(intent)
+        val app = applicationContext as AntiGastosApplication
+        com.antigastos.boludos.ads.AdConsent.requestAndInit(this) {
+            app.initAdsAfterConsent()
+        }
         setContent {
-            AntiGastosTheme {
-                AntiGastosApp(mainViewModel = mainViewModel)
-            }
+            AppRoot(mainViewModel = mainViewModel)
         }
     }
-}
 
-@Composable
-fun AntiGastosApp(mainViewModel: MainViewModel) {
-    val app = LocalContext.current.applicationContext as AntiGastosApplication
-    val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-    val showBottomBar = currentRoute != Routes.ADD && currentRoute?.startsWith("edit/") != true
-    val showFab = currentRoute == Routes.HOME
-
-    Scaffold(
-        floatingActionButton = {
-            if (showFab) {
-                FloatingActionButton(
-                    onClick = { navController.navigate(Routes.ADD) },
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Agregar gasto")
-                }
-            }
-        },
-        bottomBar = {
-            if (showBottomBar) {
-                BottomNavigationBar(navController = navController)
-            }
-        },
-    ) { padding ->
-        NavHost(
-            navController = navController,
-            startDestination = Routes.HOME,
-            modifier = Modifier.padding(padding),
-        ) {
-            composable(Routes.HOME) {
-                val vm: HomeViewModel = viewModel(factory = HomeViewModel.factory(app, mainViewModel))
-                HomeScreen(
-                    viewModel = vm,
-                    mainViewModel = mainViewModel,
-                    onOpenList = {
-                        navController.navigate(Routes.LIST) {
-                            launchSingleTop = true
-                        }
-                    },
-                    onOpenStats = {
-                        navController.navigate(Routes.STATS) {
-                            launchSingleTop = true
-                        }
-                    },
-                    onOpenGoals = {
-                        navController.navigate(Routes.GOALS) {
-                            launchSingleTop = true
-                        }
-                    },
-                )
-            }
-            composable(Routes.LIST) {
-                val vm: ExpenseListViewModel = viewModel(factory = ExpenseListViewModel.factory(app, mainViewModel))
-                ExpenseListScreen(
-                    viewModel = vm,
-                    mainViewModel = mainViewModel,
-                    onEdit = { id -> navController.navigate(Routes.edit(id)) },
-                )
-            }
-            composable(Routes.STATS) {
-                val vm: StatsViewModel = viewModel(factory = StatsViewModel.factory(app, mainViewModel))
-                StatsScreen(viewModel = vm, mainViewModel = mainViewModel)
-            }
-            composable(Routes.GOALS) {
-                val vm: GoalsViewModel = viewModel(factory = GoalsViewModel.factory(app, mainViewModel))
-                GoalsScreen(viewModel = vm, mainViewModel = mainViewModel)
-            }
-            composable(Routes.ADD) {
-                val vm: ExpenseEditorViewModel = viewModel(
-                    key = "add",
-                    factory = ExpenseEditorViewModel.factory(app, null),
-                )
-                ExpenseEditorScreen(
-                    viewModel = vm,
-                    title = "Nuevo gasto",
-                    onBack = { navController.popBackStack() },
-                    onSaved = { navController.popBackStack() },
-                )
-            }
-            composable(
-                route = Routes.EDIT,
-                arguments = listOf(navArgument("expenseId") { type = NavType.LongType }),
-            ) {
-                val id = it.arguments!!.getLong("expenseId")
-                val vm: ExpenseEditorViewModel = viewModel(
-                    key = "edit_$id",
-                    factory = ExpenseEditorViewModel.factory(app, id),
-                )
-                ExpenseEditorScreen(
-                    viewModel = vm,
-                    title = "Editar gasto",
-                    onBack = { navController.popBackStack() },
-                    onSaved = { navController.popBackStack() },
-                )
+    override fun onResume() {
+        super.onResume()
+        val app = applicationContext as? AntiGastosApplication ?: return
+        // Auto-lock: si pasaron N minutos, pedir biometría de nuevo (si está activa).
+        app.applicationScope.launch {
+            val s = app.settingsRepository.flow.first()
+            val minutes = s.autoLockMinutes
+            val elapsedMin = (System.currentTimeMillis() - app.lastInteractionAt) / 60000L
+            if (s.biometricLockEnabled && minutes > 0 && elapsedMin >= minutes) {
+                mainViewModel.requestAppLock()
             }
         }
+        lifecycleScope.launch {
+            StreakStatusNotifier.refresh(app)
+        }
     }
-}
 
-@Composable
-private fun BottomNavigationBar(navController: NavController) {
-    NavigationBar {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
+    override fun onPause() {
+        super.onPause()
+        (applicationContext as? AntiGastosApplication)?.touchInteraction()
+    }
 
-        val items = listOf(
-            Triple(Routes.HOME, "Inicio", Icons.Default.Home),
-            Triple(Routes.LIST, "Lista", Icons.Default.FormatListBulleted),
-            Triple(Routes.STATS, "Stats", Icons.Default.BarChart),
-            Triple(Routes.GOALS, "Metas", Icons.Default.Flag),
-        )
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        consumeRouteIntent(intent)
+    }
 
-        items.forEach { (route, label, icon) ->
-            NavigationBarItem(
-                icon = { Icon(icon, contentDescription = label) },
-                label = { Text(label) },
-                selected = currentDestination?.hierarchy?.any { it.route == route } == true,
-                onClick = {
-                    navController.navigate(route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-            )
+    private fun consumeRouteIntent(intent: Intent?) {
+        intent?.getStringExtra(Routes.EXTRA_OPEN_ROUTE)?.takeIf { it.isNotBlank() }?.let {
+            mainViewModel.postPendingRoute(it)
+        }
+        consumeDeeplinkIntent(intent)
+    }
+
+    private fun consumeDeeplinkIntent(intent: Intent?) {
+        val data: Uri = intent?.data ?: return
+        if (data.scheme == "antigastos" && data.host == "crush") {
+            val idStr = data.pathSegments.lastOrNull()
+            val id = idStr?.toLongOrNull()
+            if (id != null) {
+                mainViewModel.postPendingRoute(Routes.crushResolve(id))
+            }
+            return
+        }
+        val route = when (data.toString()) {
+            Notifier.DEEPLINK_HOME -> Routes.HOME
+            Notifier.DEEPLINK_LIST -> Routes.LIST
+            Notifier.DEEPLINK_RECAP -> Routes.RECAP
+            Notifier.DEEPLINK_ACHIEVEMENTS -> Routes.ACHIEVEMENTS
+            Notifier.DEEPLINK_LOTERIA -> Routes.LOTERIA
+            else -> null
+        } ?: return
+        mainViewModel.postPendingRoute(route)
+    }
+
+    private fun maybeRequestNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val granted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS,
+        ) == PackageManager.PERMISSION_GRANTED
+        if (!granted) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 }

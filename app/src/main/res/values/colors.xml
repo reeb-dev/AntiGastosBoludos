@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="notification_accent">#74ACDF</color>
+    <color name="notification_reward">#2E7D32</color>
+    <color name="notification_fail">#C62828</color>
+    <color name="notification_warning">#EF6C00</color>
+    <color name="notification_friend">#1565C0</color>
+</resources>
