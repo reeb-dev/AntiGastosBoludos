@@ -1,6 +1,7 @@
 package com.antigastos.boludos.data
 
 import android.util.Log
+import com.antigastos.boludos.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -86,7 +87,11 @@ class GeminiApi(
         response.use { res ->
             val bodyStr = res.body?.string().orEmpty()
             if (!res.isSuccessful) {
-                Log.w(TAG, "HTTP ${res.code}: $bodyStr")
+                if (BuildConfig.DEBUG) {
+                    Log.w(TAG, "HTTP ${res.code}: $bodyStr")
+                } else {
+                    Log.w(TAG, "HTTP ${res.code}")
+                }
                 return@withContext when (res.code) {
                     400, 401, 403 -> Result.Err(ErrorKind.AUTH, "API key inválida o sin permiso.")
                     429 -> Result.Err(ErrorKind.RATE_LIMIT, "Te pasaste del límite gratis. Probá en un rato.")

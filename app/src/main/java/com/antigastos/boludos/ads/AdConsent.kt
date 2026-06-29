@@ -10,7 +10,10 @@ import com.google.android.ump.UserMessagingPlatform
  */
 object AdConsent {
 
-    fun requestAndInit(activity: Activity, onComplete: () -> Unit) {
+    fun canRequestAds(activity: Activity): Boolean =
+        UserMessagingPlatform.getConsentInformation(activity).canRequestAds()
+
+    fun requestAndInit(activity: Activity, onComplete: (Boolean) -> Unit) {
         val params = ConsentRequestParameters.Builder().build()
         val consentInformation = UserMessagingPlatform.getConsentInformation(activity)
         consentInformation.requestConsentInfoUpdate(
@@ -18,10 +21,10 @@ object AdConsent {
             params,
             {
                 UserMessagingPlatform.loadAndShowConsentFormIfRequired(activity) { _ ->
-                    onComplete()
+                    onComplete(consentInformation.canRequestAds())
                 }
             },
-            { onComplete() },
+            { onComplete(consentInformation.canRequestAds()) },
         )
     }
 

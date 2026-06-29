@@ -323,7 +323,7 @@ fun SettingsScreen(
             }
 
             Text(
-                "Lo que pegás en el campo de IA va directo a Google. La app no lo guarda en ningún server.",
+                "La API key opcional se guarda solo en tu teléfono (base local). Los mensajes de IA se envían a Google.",
                 style = MaterialTheme.typography.labelSmall,
             )
         }

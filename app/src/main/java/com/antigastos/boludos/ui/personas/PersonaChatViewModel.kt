@@ -11,7 +11,9 @@ import com.antigastos.boludos.domain.CopyContext
 import com.antigastos.boludos.domain.CopyMood
 import com.antigastos.boludos.domain.PersonaCatalog
 import com.antigastos.boludos.domain.PersonaChatEngine
-import com.antigastos.boludos.domain.PersonaCopyPacks
+import com.antigastos.boludos.domain.chat.LocalPersonaEngine
+import com.antigastos.boludos.domain.chat.PersonaQuickSuggestion
+import com.antigastos.boludos.domain.chat.PersonaQuickSuggestions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -23,16 +25,8 @@ import kotlinx.coroutines.launch
 
 /**
  * Sugerencia rápida que aparece como chip en el chat.
- *
- * Es un par "label visible" + "texto que efectivamente se envía", para
- * que las sugerencias contextuales (ej. "¿qué hago con el delivery?")
- * se sientan ricas pero no terminen poniéndolas literal en el input.
  */
-data class QuickPrompt(
-    val emoji: String,
-    val label: String,
-    val message: String,
-)
+typealias QuickPrompt = PersonaQuickSuggestion
 
 class PersonaChatViewModel(
     private val app: AntiGastosApplication,
@@ -76,15 +70,15 @@ class PersonaChatViewModel(
      * el chat, las sugerencias se actualizan solas.
      */
     val quickPrompts: StateFlow<List<QuickPrompt>> = combine(_context, _mood) { ctx, mood ->
-        buildQuickPrompts(ctx, mood)
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, defaultPrompts())
+        PersonaQuickSuggestions.build(ctx, mood)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, PersonaQuickSuggestions.defaults())
 
     init {
         // Cargamos el contexto al abrir el chat así los chips arrancan con info real.
         viewModelScope.launch {
             val ctx = buildCtxOrNull()
             _context.value = ctx
-            _mood.value = moodFor(ctx)
+            _mood.value = LocalPersonaEngine.moodFor(ctx)
         }
     }
 
@@ -131,11 +125,9 @@ class PersonaChatViewModel(
             val msgs = app.chatRepository.history(personaKey)
             if (msgs.isNotEmpty()) return@launch
             val ctx = _context.value ?: buildCtxOrNull()
-            val mood = moodFor(ctx)
+            val mood = LocalPersonaEngine.moodFor(ctx)
             _mood.value = mood
-            val pack = PersonaCopyPacks.pool(personaKey, mood, ctx ?: emptyContext())
-            val greet = pack.randomOrNull()
-                ?: "Acá ando. Tirale un mensaje y te bardéo (con onda)."
+            val greet = LocalPersonaEngine.greet(personaKey, ctx)
             app.chatRepository.appendPersona(personaKey, greet)
             _lastReplyFromAi.value = false
         }
@@ -163,20 +155,26 @@ class PersonaChatViewModel(
         val s = app.settingsRepository.flow.first()
         val key = GeminiCredentials.resolve(s)
         if (!GeminiCredentials.isEffectiveEnabled(s)) {
-            _lastError.value = "Activá la IA en Ajustes (y API key si no usás Vertex en Firebase)."
-            // Usamos pack offline para no dejar el chat colgado.
-            val pack = PersonaCopyPacks.pool(personaKey, _mood.value, _context.value ?: emptyContext())
-            val text = pack.randomOrNull()
-                ?: "Tirá la moneda nomás. Sin nube no puedo improvisar mucho."
+            val ctx = _context.value ?: buildCtxOrNull().also { _context.value = it }
+            _mood.value = LocalPersonaEngine.moodFor(ctx)
+            val history = app.chatRepository.history(personaKey)
+            val recent = history.filter { it.role == "persona" }.map { it.text }
+            val text = LocalPersonaEngine.chatReply(
+                personaKey = personaKey,
+                ctx = ctx,
+                userMessage = userText,
+                recentPersonaLines = recent,
+            )
             app.chatRepository.appendPersona(personaKey, text)
             _lastReplyFromAi.value = false
+            _lastError.value = null
             return
         }
 
         _typing.value = true
         try {
             val ctx = _context.value ?: buildCtxOrNull().also { _context.value = it }
-            _mood.value = moodFor(ctx)
+            _mood.value = LocalPersonaEngine.moodFor(ctx)
 
             val history = app.chatRepository.history(personaKey)
                 .takeLast(MAX_HISTORY_TURNS)
@@ -217,105 +215,7 @@ class PersonaChatViewModel(
         pctOfMonthlyGoal = null,
     )
 
-    private fun moodFor(ctx: CopyContext?): CopyMood = when {
-        ctx == null || ctx.totalLucas == 0 -> CopyMood.NEUTRAL
-        (ctx.pctOfMonthlyGoal ?: 0.0) >= 1.05 -> CopyMood.ALARM
-        ctx.totalLucas >= 150 -> CopyMood.BURN
-        ctx.daySpentLucas == 0 && ctx.expenseCount > 0 -> CopyMood.CHEER
-        else -> CopyMood.NEUTRAL
-    }
-
-    /**
-     * Construye sugerencias rápidas mirando la categoría más cara, el día
-     * del mes, el % de meta y el mood. La idea: que el usuario pueda
-     * mantener la conversa sin tipear.
-     */
-    private fun buildQuickPrompts(ctx: CopyContext?, mood: CopyMood): List<QuickPrompt> {
-        val out = mutableListOf<QuickPrompt>()
-
-        // Universal: "cómo voy"
-        out += QuickPrompt(
-            emoji = "🎯",
-            label = "¿Cómo voy?",
-            message = "Decime con onda cómo voy con la guita este mes y dame un consejo concreto.",
-        )
-
-        // Categoría top → prompt específico
-        val topSlug = ctx?.topCategorySlug
-        if (topSlug != null && ctx.topCategoryLucas > 0) {
-            val niceCat = ctx.topCategoryName ?: topSlug
-            out += QuickPrompt(
-                emoji = "💸",
-                label = "¿Y mi $niceCat?",
-                message = "Mi categoría más cara es \"$niceCat\". Bardeame ahí, pero de paso dame un truco para bajarla.",
-            )
-        }
-
-        // Mood → prompt afín
-        when (mood) {
-            CopyMood.ALARM -> out += QuickPrompt(
-                emoji = "🚨",
-                label = "Estoy hasta las manos",
-                message = "Estoy bardo con la guita este mes, ¿qué corno hago para no fundirme?",
-            )
-            CopyMood.BURN -> out += QuickPrompt(
-                emoji = "🔥",
-                label = "Bardéame",
-                message = "Bardéame en personaje por lo que estoy gastando, ponete pesado pero gracioso.",
-            )
-            CopyMood.CHEER -> out += QuickPrompt(
-                emoji = "🏆",
-                label = "Felicitame",
-                message = "Hoy no gasté nada. Hacé un comentario en personaje, dame un cierre lindo.",
-            )
-            CopyMood.NEUTRAL -> out += QuickPrompt(
-                emoji = "🫡",
-                label = "Tirame un consejo",
-                message = "Tirame UN consejo financiero corto, en personaje y rioplatense.",
-            )
-        }
-
-        // Fin de mes
-        val day = ctx?.dayOfMonth ?: 0
-        if (day in 22..31) {
-            out += QuickPrompt(
-                emoji = "📅",
-                label = "Llegar al 30",
-                message = "Estamos cerca de fin de mes. Tirame una estrategia rapidísima para llegar al 30 sin pedir prestado.",
-            )
-        }
-
-        // Pasada de meta
-        val pct = ctx?.pctOfMonthlyGoal ?: 0.0
-        if (pct >= 1.0) {
-            out += QuickPrompt(
-                emoji = "🎯",
-                label = "Pasé la meta",
-                message = "Ya pasé la meta del mes. ¿Qué cortes me sugerís en una sola frase?",
-            )
-        } else if (pct in 0.85..0.999) {
-            out += QuickPrompt(
-                emoji = "⚠️",
-                label = "Casi al límite",
-                message = "Estoy al ${(pct * 100).toInt()}% de la meta del mes y faltan días. ¿Qué pinta?",
-            )
-        }
-
-        // Universal de cierre: psicoanálisis express, divertido.
-        out += QuickPrompt(
-            emoji = "🧠",
-            label = "Analizame",
-            message = "Mirá mis gastos del mes y hacé como si fueras psicólogo de billetera: ¿qué patrón ves?",
-        )
-
-        return out.distinctBy { it.label }
-    }
-
-    private fun defaultPrompts(): List<QuickPrompt> = listOf(
-        QuickPrompt("🎯", "¿Cómo voy?", "Decime cómo voy con la guita este mes."),
-        QuickPrompt("🔥", "Bardéame", "Bardéame con onda por mis gastos."),
-        QuickPrompt("🧠", "Analizame", "Mirá mis gastos y hacé un mini análisis."),
-    )
+    private fun moodFor(ctx: CopyContext?): CopyMood = LocalPersonaEngine.moodFor(ctx)
 
     companion object {
         private const val MAX_HISTORY_TURNS = 16

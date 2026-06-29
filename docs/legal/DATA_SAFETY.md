@@ -32,10 +32,11 @@ Declarar como **recopilados** pero **no compartidos** si Play lo pide para “da
 | Tipo | Cuándo | Proveedor |
 |------|--------|-----------|
 | Búsqueda en la app (keywords GIF) | `localStickersOnly = false` | Giphy / Tenor / Klipy |
+| Contenido de imagen (memes) | `localStickersOnly = false` | meme-api.com |
 
 ## Permisos relevantes
 
-- `INTERNET`, `AD_ID`, `POST_NOTIFICATIONS`, `USE_BIOMETRIC`
+- `INTERNET`, `AD_ID`, `POST_NOTIFICATIONS`, `USE_BIOMETRIC`, `VIBRATE`
 
 ## Política de privacidad
 

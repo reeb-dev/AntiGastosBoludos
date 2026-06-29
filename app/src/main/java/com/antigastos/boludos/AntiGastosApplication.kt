@@ -28,6 +28,7 @@ import com.antigastos.boludos.voice.TtsSpeaker
 import com.antigastos.boludos.work.WorkSchedulers
 import com.antigastos.boludos.ads.AdHelper
 import com.antigastos.boludos.ads.AdMonetizationTracker
+import com.antigastos.boludos.widget.HomeAppWidget
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -87,6 +88,7 @@ class AntiGastosApplication : Application(), ImageLoaderFactory {
             repository.setExpensesChangedListener {
                 applicationScope.launch {
                     StreakStatusNotifier.refresh(this@AntiGastosApplication)
+                    HomeAppWidget.refreshAll(this@AntiGastosApplication)
                 }
             }
             WeeklyChallengeSeeder.maybeSeed(this@AntiGastosApplication)

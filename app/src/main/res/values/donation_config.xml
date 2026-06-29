@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Datos públicos para cafecito (también en BuildConfig si local.properties los define). -->
 <resources>
-    <string name="donation_alias" translatable="false">acatar.borne.isla.mp</string>
-    <string name="donation_cbu" translatable="false">0000003100038131145602</string>
-    <string name="donation_holder" translatable="false">REEB</string>
+    <string name="donation_alias" translatable="false">tu.alias.mp</string>
+    <string name="donation_cbu" translatable="false">0000003100010000000000</string>
+    <string name="donation_holder" translatable="false">Tu Nombre</string>
 </resources>

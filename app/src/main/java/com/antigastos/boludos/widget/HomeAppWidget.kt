@@ -3,6 +3,7 @@ package com.antigastos.boludos.widget
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
@@ -22,6 +23,19 @@ import kotlinx.coroutines.withContext
  * Widget de escritorio: total gastado hoy + atajo para cargar gasto.
  */
 class HomeAppWidget : AppWidgetProvider() {
+
+    companion object {
+        fun refreshAll(context: Context) {
+            val mgr = AppWidgetManager.getInstance(context)
+            val ids = mgr.getAppWidgetIds(ComponentName(context, HomeAppWidget::class.java))
+            if (ids.isEmpty()) return
+            val intent = Intent(context, HomeAppWidget::class.java).apply {
+                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+            }
+            context.sendBroadcast(intent)
+        }
+    }
 
     override fun onUpdate(
         context: Context,

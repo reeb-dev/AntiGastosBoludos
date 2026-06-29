@@ -1,16 +1,11 @@
 package com.antigastos.boludos
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -34,19 +29,16 @@ class MainActivity : FragmentActivity() {
 
     private val mainViewModel: MainViewModel by viewModels()
 
-    private val notificationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission(),
-    ) { /* el resultado no nos detiene; si no concede, las notis simplemente no salen */ }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        maybeRequestNotificationPermission()
         consumeRouteIntent(intent)
         val app = applicationContext as AntiGastosApplication
-        com.antigastos.boludos.ads.AdConsent.requestAndInit(this) {
-            app.initAdsAfterConsent()
+        com.antigastos.boludos.ads.AdConsent.requestAndInit(this) { canShowAds ->
+            if (canShowAds) {
+                app.initAdsAfterConsent()
+            }
         }
         setContent {
             AppRoot(mainViewModel = mainViewModel)
@@ -106,16 +98,5 @@ class MainActivity : FragmentActivity() {
             else -> null
         } ?: return
         mainViewModel.postPendingRoute(route)
-    }
-
-    private fun maybeRequestNotificationPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
-        val granted = ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.POST_NOTIFICATIONS,
-        ) == PackageManager.PERMISSION_GRANTED
-        if (!granted) {
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
     }
 }

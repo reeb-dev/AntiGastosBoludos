@@ -5,6 +5,7 @@ import com.antigastos.boludos.data.GeminiApi
 import com.antigastos.boludos.data.local.entity.ChatMessageEntity
 import com.antigastos.boludos.domain.ConsejoKind
 import com.antigastos.boludos.domain.RuletaCatalog
+import com.antigastos.boludos.domain.chat.LocalPersonaEngine
 
 /**
  * Engine que toma:
@@ -108,8 +109,7 @@ class PersonaChatEngine(
         return when (res) {
             is GeminiApi.Result.Ok -> Reply.FromAi(res.text)
             is GeminiApi.Result.Err -> {
-                val pack = PersonaCopyPacks.pool(personaKey, mood, ctx)
-                val text = pack.randomOrNull() ?: "Bancá la guita, capo."
+                val text = LocalPersonaEngine.shortPhrase(personaKey, ctx, mood)
                 Reply.Fallback(text = text, reason = res.message)
             }
         }
@@ -205,29 +205,10 @@ class PersonaChatEngine(
         return rest(apiKey)
     }
 
-    private fun localFallback(personaKey: String, userMessage: String, ctx: CopyContext?): String {
-        // Detectar mood implícito según contexto financiero.
-        val mood = when {
-            ctx == null || ctx.totalLucas == 0 -> CopyMood.NEUTRAL
-            (ctx.pctOfMonthlyGoal ?: 0.0) >= 1.05 -> CopyMood.ALARM
-            ctx.totalLucas >= 150 -> CopyMood.BURN
-            ctx.daySpentLucas == 0 && ctx.expenseCount > 0 -> CopyMood.CHEER
-            else -> CopyMood.NEUTRAL
-        }
-        val safeCtx = ctx ?: CopyContext(
-            monthLabel = "este mes",
-            totalLucas = 0,
-            topCategoryName = null,
-            topCategorySlug = null,
-            topCategoryLucas = 0,
-            deltaLucasVsPrevMonth = null,
-            pctOfMonthlyGoal = null,
+    private fun localFallback(personaKey: String, userMessage: String, ctx: CopyContext?): String =
+        LocalPersonaEngine.chatReply(
+            personaKey = personaKey,
+            ctx = ctx,
+            userMessage = userMessage,
         )
-        val pack = PersonaCopyPacks.pool(personaKey, mood, safeCtx)
-        val pick = pack.randomOrNull() ?: "Mirá vo', sin red para charlar. Más tarde te vuelvo a romper las pelotas."
-
-        // Pequeño guiño contextual al mensaje del usuario.
-        val short = userMessage.take(60).trim()
-        return if (short.isBlank()) pick else pick
-    }
 }

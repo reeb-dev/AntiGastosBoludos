@@ -53,10 +53,6 @@ android {
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "TENOR_API_KEY", "\"$tenorApiKey\"")
-        buildConfigField("String", "GIPHY_API_KEY", "\"$giphyApiKey\"")
-        buildConfigField("String", "KLIPY_API_KEY", "\"$klipyApiKey\"")
-        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
         buildConfigField("String", "DONATION_CBU", "\"$donationCbu\"")
         buildConfigField("String", "DONATION_HOLDER", "\"$donationHolder\"")
         buildConfigField("String", "DONATION_ALIAS", "\"$donationAlias\"")
@@ -74,8 +70,19 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "TENOR_API_KEY", "\"$tenorApiKey\"")
+            buildConfigField("String", "GIPHY_API_KEY", "\"$giphyApiKey\"")
+            buildConfigField("String", "KLIPY_API_KEY", "\"$klipyApiKey\"")
+            buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
+        }
         release {
             isMinifyEnabled = false
+            // Nunca embeber GEMINI en release: usar Firebase AI (google-services.json).
+            buildConfigField("String", "TENOR_API_KEY", "\"$tenorApiKey\"")
+            buildConfigField("String", "GIPHY_API_KEY", "\"$giphyApiKey\"")
+            buildConfigField("String", "KLIPY_API_KEY", "\"$klipyApiKey\"")
+            buildConfigField("String", "GEMINI_API_KEY", "\"\"")
             if (releaseStoreFile.isNotBlank()) {
                 signingConfig = signingConfigs.getByName("release")
             }
@@ -156,4 +163,17 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+tasks.configureEach {
+    if (name == "bundleRelease" || name == "assembleRelease") {
+        doFirst {
+            if (releaseStoreFile.isBlank()) {
+                error(
+                    "Firma release no configurada. Definí RELEASE_STORE_FILE (y credenciales) " +
+                        "en local.properties antes de generar el AAB de producción.",
+                )
+            }
+        }
+    }
 }

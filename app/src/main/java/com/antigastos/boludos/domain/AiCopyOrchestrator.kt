@@ -3,6 +3,7 @@ package com.antigastos.boludos.domain
 import android.util.Log
 import com.antigastos.boludos.data.AiQuota
 import com.antigastos.boludos.data.GeminiCredentials
+import com.antigastos.boludos.domain.chat.LocalPersonaEngine
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
@@ -59,7 +60,10 @@ class AiCopyOrchestrator(
     ): Result {
         // Sin IA o sin forma de llegar a la nube (Vertex + key vacía): local.
         if (!aiEnabled || (!GeminiCredentials.firebaseAiReady && apiKey.isBlank())) {
-            return Result(text = fallbackText, aiUsed = false)
+            return Result(
+                text = LocalPersonaEngine.shortPhrase(personaKey, ctx, mood),
+                aiUsed = false,
+            )
         }
 
         val key = signature(cacheBucket, personaKey, mood, ctx)
@@ -88,7 +92,7 @@ class AiCopyOrchestrator(
             val r = when (reply) {
                 is PersonaChatEngine.Reply.FromAi -> Result(text = reply.text, aiUsed = true)
                 is PersonaChatEngine.Reply.Fallback -> Result(
-                    text = fallbackText,
+                    text = LocalPersonaEngine.shortPhrase(personaKey, ctx, mood),
                     aiUsed = false,
                     error = reply.reason,
                 )
@@ -170,7 +174,10 @@ class AiCopyOrchestrator(
         apiKey: String,
     ): Result {
         if (!aiEnabled || (!GeminiCredentials.firebaseAiReady && apiKey.isBlank())) {
-            return Result(text = body, aiUsed = false)
+            return Result(
+                text = LocalPersonaEngine.consejoBody(personaKey, title, body),
+                aiUsed = false,
+            )
         }
 
         val key = listOf(

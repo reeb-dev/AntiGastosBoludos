@@ -2,8 +2,8 @@
 
 ## Antes de subir el AAB
 
-- [ ] `local.properties` con `DONATION_ALIAS` (o usar `res/values/donation_config.xml` ya commiteado)
-- [ ] **No** embeber `GEMINI_API_KEY` en release (usar Firebase AI)
+- [ ] `local.properties` con `DONATION_ALIAS`, `DONATION_CBU`, `DONATION_HOLDER` (no commitear datos reales en `donation_config.xml`)
+- [ ] **No** embeber `GEMINI_API_KEY` en release — el build de release la fuerza vacía; usar Firebase AI (`google-services.json`)
 - [ ] `google-services.json` en `app/` (no va a git; copiar en CI/máquina de release)
 - [ ] Keystore release en `local.properties`:
   ```properties
@@ -12,7 +12,7 @@
   RELEASE_KEY_ALIAS=...
   RELEASE_KEY_PASSWORD=...
   ```
-- [ ] Compilar: `./gradlew :app:bundleRelease`
+- [ ] Compilar: `./gradlew :app:bundleRelease` (falla si no hay `RELEASE_STORE_FILE`)
 - [ ] Probar el AAB en un dispositivo real (internal testing)
 
 ## Play Console
@@ -23,7 +23,8 @@
 - [ ] Clasificación de contenido (lenguaje informal argentino, simulación de ruleta/lotería, anuncios)
 - [ ] Capturas de pantalla (teléfono 6.7")
 - [ ] Icono 512×512 (`app/src/main/ic_launcher-playstore.png`)
-- [ ] AdMob: app vinculada + UMP configurado en consola
+- [ ] AdMob: app vinculada + **mensaje GDPR/UMP** configurado en consola (Privacy & messaging)
+- [ ] Declarar **contiene anuncios** y completar formulario de ads
 
 ## Repositorio privado
 

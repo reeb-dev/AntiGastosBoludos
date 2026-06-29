@@ -6,5 +6,6 @@
 | [legal/PUBLICAR_POLITICA.md](legal/PUBLICAR_POLITICA.md) | Cómo obtener URL pública para Play Console |
 | [legal/DATA_SAFETY.md](legal/DATA_SAFETY.md) | Guía del formulario Data safety |
 | [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) | Checklist AAB, firma, consola |
+| [SUGERENCIAS.md](SUGERENCIAS.md) | Mejoras priorizadas post-auditoría |
 
 **Contacto:** jesusseep@gmail.com

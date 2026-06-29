@@ -33,13 +33,16 @@
 <p>La app almacena localmente (base de datos SQLite en el dispositivo):</p>
 <ul>
     <li>Gastos, categorías, metas, presupuestos y suscripciones</li>
-    <li>Preferencias (personaje, notificaciones, biometría, sueldo para “horas de vida”, etc.)</li>
+    <li>Preferencias (personaje, notificaciones, biometría, sueldo para “horas de vida”, nombre de pareja en modo pareja, etc.)</li>
     <li>Mensajes de chat con personajes (historial local)</li>
+    <li>API key de Gemini opcional que ingresés vos (solo en el dispositivo)</li>
     <li>Contadores de anuncios vistos (solo en el dispositivo, para estimaciones internas)</li>
 </ul>
 <p>
     <strong>No hay cuenta de usuario ni sincronización en la nube.</strong>
-    Si desinstalás la app, esos datos se pierden salvo que tu sistema operativo haga backup propio.
+    Si desinstalás la app, esos datos se pierden. La base de datos no se incluye en backups
+    automáticos de Google en la nube. Algunas actualizaciones de la app pueden requerir
+    recrear la base local; en ese caso también se pierden los datos guardados.
 </p>
 
 <h2>3. Datos enviados a terceros</h2>
@@ -48,6 +51,7 @@
     <li><strong>Firebase Analytics:</strong> métricas de uso agregadas y anónimas.</li>
     <li><strong>Google Gemini / Firebase AI (opcional):</strong> si activás “Frases con IA”, se envían textos (prompts) a los servidores de Google para generar respuestas.</li>
     <li><strong>APIs de GIFs (Giphy, Tenor, Klipy):</strong> solo si desactivás “Solo emoticones locales” y la app busca memes en internet.</li>
+    <li><strong>meme-api.com:</strong> imágenes meme de respaldo cuando las APIs de GIF no responden (misma condición: no “solo emoticones locales”).</li>
 </ul>
 <p>No vendemos tus datos personales.</p>
 
@@ -64,7 +68,7 @@
     <li><strong>Internet:</strong> anuncios, IA opcional, GIFs opcionales.</li>
     <li><strong>Notificaciones:</strong> recordatorios de gastos y rachas (opcional).</li>
     <li><strong>Biometría:</strong> bloqueo opcional al abrir la app (datos biométricos no salen del dispositivo; los gestiona Android).</li>
-    <li><strong>Facturación Play:</strong> no usada en la versión actual (donaciones por transferencia).</li>
+    <li><strong>Vibración:</strong> feedback háptico opcional al cargar gastos (no sale del dispositivo).</li>
 </ul>
 
 <h2>6. Menores</h2>

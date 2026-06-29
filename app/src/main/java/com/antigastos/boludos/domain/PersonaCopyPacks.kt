@@ -784,4 +784,50 @@ object PersonaCopyPacks {
             "Hermosa, agarrá un mate, una taza, una almohada y llorá un rato. Después arreglamos.",
         )
     }
+
+    /**
+     * Elige una frase del pack evitando repetir las recientes en el chat.
+     */
+    fun pick(
+        personaKey: String,
+        mood: CopyMood,
+        ctx: CopyContext,
+        exclude: Set<String> = emptySet(),
+        rng: kotlin.random.Random = kotlin.random.Random.Default,
+    ): String {
+        val pool = pool(personaKey, mood, ctx)
+        val choices = pool.filter { it !in exclude }.ifEmpty { pool }
+        return choices.randomOrNull() ?: "Bancá la guita, capo."
+    }
+
+    /**
+     * Datos del mes tejidos en una oración extra (todas las personas).
+     * Se mezcla con el pack para frases más situadas sin IA.
+     */
+    fun contextualLines(ctx: CopyContext, mood: CopyMood): List<String> {
+        val lines = mutableListOf<String>()
+        ctx.topCategoryName?.takeIf { ctx.topCategoryLucas > 0 }?.let { cat ->
+            lines += "En $cat ya llevás ${ctx.topCategoryLucas} lucas."
+        }
+        ctx.pctOfMonthlyGoal?.let { pct ->
+            when {
+                pct >= 1.0 -> lines += "La meta ya la pasaste (${(pct * 100).toInt()}%)."
+                pct >= 0.85 -> lines += "Casi en el tope: ${(pct * 100).toInt()}% de la meta."
+            }
+        }
+        if (ctx.dayOfMonth in 22..31) {
+            val left = (ctx.daysInMonth - ctx.dayOfMonth).coerceAtLeast(1)
+            lines += "Quedan $left días de ${ctx.monthLabel}."
+        }
+        ctx.deltaLucasVsPrevMonth?.let { d ->
+            when {
+                d > 15 -> lines += "Venís ${d} lucas arriba del mes pasado."
+                d < -10 -> lines += "Mejoraste ${-d} lucas vs el mes anterior."
+            }
+        }
+        if (mood == CopyMood.BURN && ctx.lastExpenseLucas > 0) {
+            lines += "El último gasto fue de ${ctx.lastExpenseLucas} lucas."
+        }
+        return lines
+    }
 }
