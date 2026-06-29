@@ -1,6 +1,7 @@
 package com.antigastos.boludos.notifications
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -274,8 +275,14 @@ object Notifier {
             .setContentIntent(pi)
         if (group != null) builder.setGroup(group)
 
+        notifySafely(context, id, builder.build())
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun notifySafely(context: Context, id: Int, notification: android.app.Notification) {
+        if (!hasPermission(context)) return
         runCatching {
-            NotificationManagerCompat.from(context).notify(id, builder.build())
+            NotificationManagerCompat.from(context).notify(id, notification)
         }
     }
 
@@ -302,9 +309,7 @@ object Notifier {
             .setAutoCancel(true)
             .setContentIntent(pi)
             .build()
-        runCatching {
-            NotificationManagerCompat.from(context).notify(summaryId, summary)
-        }
+        notifySafely(context, summaryId, summary)
     }
 
     private fun categoryFor(channelId: String): String = when (channelId) {

@@ -1,5 +1,6 @@
 package com.antigastos.boludos.notifications
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -91,6 +92,12 @@ object StreakStatusNotifier {
             .addAction(0, "+10 mil", add10)
             .build()
 
+        postOngoing(ctx, noti)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun postOngoing(ctx: Context, noti: android.app.Notification) {
+        if (!Notifier.hasPostNotificationsPermission(ctx)) return
         runCatching {
             NotificationManagerCompat.from(ctx).notify(NOTIFICATION_ID, noti)
         }

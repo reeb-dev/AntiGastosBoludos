@@ -38,6 +38,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -93,7 +94,9 @@ fun ExpenseEditorScreen(
                 onValueChange = viewModel::setAmountDigits,
                 label = { Text("Monto (pesos)") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("expense_amount"),
                 singleLine = true,
                 supportingText = {
                     val v = state.amountDigits.toLongOrNull()
@@ -158,7 +161,9 @@ fun ExpenseEditorScreen(
 
             Button(
                 onClick = { viewModel.save(onSaved) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("expense_save"),
                 enabled = !state.saving &&
                     state.amountDigits.toLongOrNull()?.let { it > 0 } == true &&
                     state.selectedCategoryId != null,
