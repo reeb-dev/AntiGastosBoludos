@@ -6,7 +6,7 @@ Play Store exige una **URL pública** accesible sin instalar la app. El reposito
 
 1. Creá un repositorio **público** solo para legal, por ejemplo `antigastos-legal`, o usá GitHub Pages en un repo público.
 2. Subí `docs/legal/privacy_policy.html` como `index.html` en la rama `gh-pages`.
-3. URL resultante: `https://TU_USUARIO.github.io/antigastos-legal/`
+3. URL resultante: `https://reeb-dev.github.io/antigastos-legal/` (ya publicada)
 4. Pegá esa URL en Play Console → Política de privacidad.
 
 ## Opción B — Gist público
