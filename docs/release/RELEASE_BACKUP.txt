@@ -1,0 +1,57 @@
+================================================================================
+ANTI-GASTOS BOLUDOS — BACKUP RELEASE (REPO PRIVADO)
+================================================================================
+Generado: 29 de junio de 2026
+Repo: https://github.com/reeb-dev/AntiGastosBoludos (PRIVADO)
+
+⚠️  CONFIDENCIAL. Contiene keystore y contraseñas. No hacer público este repo.
+    Si alguien obtiene este archivo, puede firmar APKs como vos.
+
+--------------------------------------------------------------------------------
+1. FIRMA RELEASE (Play Store)
+--------------------------------------------------------------------------------
+applicationId:     com.antigastos.boludos
+keystore archivo:  app/release/antigastos-release.keystore
+RELEASE_STORE_FILE=/Users/manuelreeb/AndroidStudioProjects/AntiGastosBoludos/app/release/antigastos-release.keystore
+
+RELEASE_KEY_ALIAS=antigastos
+RELEASE_STORE_PASSWORD=PMwv788MvqAzib6L
+RELEASE_KEY_PASSWORD=PMwv788MvqAzib6L
+
+Certificado (upload key):
+  SHA-1:   EE:28:1B:2F:19:8B:F4:08:45:FF:FF:33:B9:07:DB:5C:9D:07:E8:98
+  SHA-256: EF:87:76:70:D4:02:92:A7:72:C1:54:7A:F1:47:4C:C3:44:77:1A:9F:57:BB:DF:51:FF:DF:A3:B2:59:7D:1B:4B
+  Válido:  2026-06-29 → 2053-11-14
+
+Compilar AAB:
+  ./gradlew :app:bundleRelease
+  Salida: app/build/outputs/bundle/release/app-release.aab
+
+--------------------------------------------------------------------------------
+2. RESTAURAR KEYSTORE EN OTRA MÁQUINA
+--------------------------------------------------------------------------------
+mkdir -p app/release
+base64 -d > app/release/antigastos-release.keystore << 'KEYSTORE_END'
+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
+KEYSTORE_END
+
+Copiar las líneas RELEASE_* de la sección 1 a local.properties.
+
+--------------------------------------------------------------------------------
+3. DONACIONES (local.properties)
+--------------------------------------------------------------------------------
+DONATION_CBU=0000003100038131145602
+DONATION_HOLDER=REEB
+DONATION_ALIAS=acatar.borne.isla.mp
+DONATION_ADMIN_EMAILS=jesusseep@gmail.com
+
+--------------------------------------------------------------------------------
+4. PLAY CONSOLE / LEGAL
+--------------------------------------------------------------------------------
+Política privacidad: https://reeb-dev.github.io/antigastos-legal/
+Política (repo):     https://github.com/reeb-dev/antigastos-legal
+AdMob App ID:        ca-app-pub-9783550633423906~4815321949
+
+google-services.json: va en app/ (NO en git; copiar manualmente)
+
+================================================================================

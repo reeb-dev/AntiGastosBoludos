@@ -7,5 +7,6 @@
 | [legal/DATA_SAFETY.md](legal/DATA_SAFETY.md) | Guía del formulario Data safety |
 | [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) | Checklist AAB, firma, consola |
 | [SUGERENCIAS.md](SUGERENCIAS.md) | Mejoras priorizadas post-auditoría |
+| [release/RELEASE_BACKUP.txt](release/RELEASE_BACKUP.txt) | Backup keystore + firma (CONFIDENCIAL, repo privado) |
 
 **Contacto:** jesusseep@gmail.com
