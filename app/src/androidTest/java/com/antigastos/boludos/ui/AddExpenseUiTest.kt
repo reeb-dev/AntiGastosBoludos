@@ -1,16 +1,18 @@
 package com.antigastos.boludos.ui
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.antigastos.boludos.AntiGastosApplication
 import com.antigastos.boludos.MainActivity
 import com.antigastos.boludos.TestUiHelper
-import com.antigastos.boludos.TestUiHelper.confirmExpenseIfNeeded
 import com.antigastos.boludos.TestUiHelper.dismissOverlays
+import com.antigastos.boludos.TestUiHelper.fillAmountAndTapSave
+import com.antigastos.boludos.TestUiHelper.openAddExpenseEditor
+import com.antigastos.boludos.TestUiHelper.waitForExpenseInList
 import com.antigastos.boludos.TestUiHelper.waitForHome
 import org.junit.Before
 import org.junit.Rule
@@ -34,26 +36,8 @@ class AddExpenseUiTest {
 
     @Test
     fun addExpense_appearsInList() {
-        composeRule.onAllNodesWithTag("fab_add_expense", useUnmergedTree = true)[0].performClick()
-
-        composeRule.waitUntil(10_000) {
-            composeRule.onAllNodesWithTag("expense_amount", useUnmergedTree = true)
-                .fetchSemanticsNodes()
-                .isNotEmpty()
-        }
-
-        composeRule.onAllNodesWithTag("expense_amount", useUnmergedTree = true)[0]
-            .performClick()
-            .performTextInput("500")
-
-        composeRule.waitUntil(10_000) {
-            composeRule.onAllNodesWithTag("expense_save", useUnmergedTree = true)
-                .fetchSemanticsNodes()
-                .isNotEmpty()
-        }
-
-        composeRule.onAllNodesWithTag("expense_save", useUnmergedTree = true)[0].performClick()
-        composeRule.confirmExpenseIfNeeded()
+        composeRule.openAddExpenseEditor()
+        composeRule.fillAmountAndTapSave("500")
 
         composeRule.waitUntil(15_000) {
             composeRule.onAllNodesWithTag("fab_add_expense", useUnmergedTree = true)
@@ -61,11 +45,30 @@ class AddExpenseUiTest {
                 .isNotEmpty()
         }
 
-        composeRule.onAllNodesWithText("Lista", useUnmergedTree = true)[0].performClick()
-        composeRule.waitUntil(10_000) {
-            composeRule.onAllNodesWithText("500", substring = true, useUnmergedTree = true)
+        composeRule.waitForExpenseInList("500")
+    }
+
+    @Test
+    fun addHighExpense_showsOverBudgetDialog_thenSaves() {
+        composeRule.openAddExpenseEditor()
+        composeRule.fillAmountAndTapSave("5000")
+
+        composeRule.waitUntil(5_000) {
+            composeRule.onAllNodesWithText("Cargarlo igual", useUnmergedTree = true)
                 .fetchSemanticsNodes()
                 .isNotEmpty()
         }
+        composeRule.onAllNodesWithText("¿Seguro que querés cargarlo?", substring = true, useUnmergedTree = true)[0]
+            .assertIsDisplayed()
+        composeRule.onAllNodesWithText("Cargarlo igual", useUnmergedTree = true)[0]
+            .performClick()
+
+        composeRule.waitUntil(15_000) {
+            composeRule.onAllNodesWithTag("fab_add_expense", useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+
+        composeRule.waitForExpenseInList("5.000")
     }
 }

@@ -58,7 +58,9 @@ private fun AppRootContent(
     var personaWelcomeShown by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        delay(1600)
+        if (!app.skipSplashForTests) {
+            delay(1600)
+        }
         splashDone = true
     }
 

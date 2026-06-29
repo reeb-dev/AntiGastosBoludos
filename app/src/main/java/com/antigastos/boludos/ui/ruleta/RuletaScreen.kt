@@ -71,6 +71,7 @@ import com.antigastos.boludos.data.local.entity.SettingsEntity
 import com.antigastos.boludos.domain.CopyMood
 import com.antigastos.boludos.domain.RuletaCatalog
 import com.antigastos.boludos.ui.common.ArgSticker
+import com.antigastos.boludos.ui.theme.ArgPalette
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -476,23 +477,23 @@ private fun moodForTipo(tipo: RuletaCatalog.Tipo): CopyMood = when (tipo) {
 
 @Composable
 private fun colorForTipo(tipo: RuletaCatalog.Tipo): Color = when (tipo) {
-    RuletaCatalog.Tipo.DESAFIO -> Color(0xFFE3F2FD)
+    RuletaCatalog.Tipo.DESAFIO -> ArgPalette.CelesteSurface
     RuletaCatalog.Tipo.INSULTO -> Color(0xFFFFEBEE)
-    RuletaCatalog.Tipo.PREDICCION -> Color(0xFFF3E5F5)
+    RuletaCatalog.Tipo.PREDICCION -> ArgPalette.SunContainer
     RuletaCatalog.Tipo.CONSEJO -> Color(0xFFE8F5E9)
 }
 
 @Composable
 private fun Wheel(angle: Float, modifier: Modifier = Modifier) {
     val sliceColors = listOf(
-        Color(0xFF6EC1E4),
-        Color(0xFFFFCC4D),
-        Color(0xFF6EC1E4),
-        Color(0xFFFFCC4D),
-        Color(0xFF6EC1E4),
-        Color(0xFFFFCC4D),
-        Color(0xFF6EC1E4),
-        Color(0xFFFFCC4D),
+        ArgPalette.Celeste,
+        ArgPalette.Sun,
+        ArgPalette.Celeste,
+        ArgPalette.Sun,
+        ArgPalette.Celeste,
+        ArgPalette.Sun,
+        ArgPalette.Celeste,
+        ArgPalette.Sun,
     )
     Canvas(modifier = modifier.rotate(angle)) {
         val sliceAngle = 360f / sliceColors.size

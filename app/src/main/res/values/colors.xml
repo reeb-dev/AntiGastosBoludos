@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="notification_accent">#74ACDF</color>
+    <!-- Paleta arg.png (bandera celeste · blanco · sol) -->
+    <color name="arg_celeste">#74ACDF</color>
+    <color name="arg_celeste_dark">#1F4E8A</color>
+    <color name="arg_celeste_light">#9CC9F0</color>
+    <color name="arg_celeste_container">#D6E8F7</color>
+    <color name="arg_celeste_surface">#E3EDF7</color>
+    <color name="arg_paper">#F7FBFF</color>
+    <color name="arg_sun">#F6B40E</color>
+    <color name="arg_ink">#0F1B2D</color>
+    <color name="arg_white">#FFFFFF</color>
+    <color name="arg_black">#000000</color>
+
+    <color name="notification_accent">@color/arg_celeste</color>
     <color name="notification_reward">#2E7D32</color>
     <color name="notification_fail">#C62828</color>
     <color name="notification_warning">#EF6C00</color>
-    <color name="notification_friend">#1565C0</color>
+    <color name="notification_friend">@color/arg_celeste_dark</color>
 </resources>

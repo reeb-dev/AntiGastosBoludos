@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import java.time.YearMonth
 import kotlinx.coroutines.runBlocking
@@ -13,6 +14,7 @@ import kotlinx.coroutines.runBlocking
 object TestUiHelper {
 
     fun prepareForUiTests(app: AntiGastosApplication) {
+        app.skipSplashForTests = true
         runBlocking {
             app.database.expenseDao().clearAll()
             app.settingsRepository.ensureRow()
@@ -81,6 +83,41 @@ object TestUiHelper {
             if (nodes.isNotEmpty()) {
                 runCatching { onAllNodesWithText(label, useUnmergedTree = true)[0].performClick() }
             }
+        }
+    }
+
+    fun AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>.openAddExpenseEditor() {
+        onAllNodesWithTag("fab_add_expense", useUnmergedTree = true)[0].performClick()
+        waitUntil(10_000) {
+            onAllNodesWithTag("expense_amount", useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+    }
+
+    fun AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>.fillAmountAndTapSave(
+        amountDigits: String,
+    ) {
+        onAllNodesWithTag("expense_amount", useUnmergedTree = true)[0]
+            .performClick()
+            .performTextInput(amountDigits)
+        waitUntil(10_000) {
+            onAllNodesWithTag("expense_save", useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+        onAllNodesWithTag("expense_save", useUnmergedTree = true)[0].performClick()
+    }
+
+    fun AndroidComposeTestRule<ActivityScenarioRule<MainActivity>, MainActivity>.waitForExpenseInList(
+        amountSubstring: String,
+        timeoutMillis: Long = 10_000L,
+    ) {
+        onAllNodesWithText("Lista", useUnmergedTree = true)[0].performClick()
+        waitUntil(timeoutMillis) {
+            onAllNodesWithText(amountSubstring, substring = true, useUnmergedTree = true)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
         }
     }
 }

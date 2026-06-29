@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.AntiGastosBoludos" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.AntiGastosBoludos" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:colorPrimary">@color/arg_celeste</item>
+        <item name="android:colorPrimaryDark">@color/arg_celeste_dark</item>
+        <item name="android:colorAccent">@color/arg_sun</item>
+        <item name="android:windowBackground">@color/arg_paper</item>
+    </style>
 
     <style name="Theme.AntiGastosBoludos.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#74ACDF</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_app</item>
+        <item name="windowSplashScreenBackground">@color/arg_black</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/arg</item>
         <item name="postSplashScreenTheme">@style/Theme.AntiGastosBoludos</item>
     </style>
 </resources>

@@ -62,6 +62,10 @@ class AntiGastosApplication : Application(), ImageLoaderFactory {
     var lastInteractionAt: Long = System.currentTimeMillis()
         private set
 
+    /** Solo para tests instrumentados: omite el delay del splash en [AppRoot]. */
+    @Volatile
+    var skipSplashForTests: Boolean = false
+
     fun touchInteraction() {
         lastInteractionAt = System.currentTimeMillis()
     }

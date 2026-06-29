@@ -5,13 +5,13 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="14dp"
-    android:background="#E3F2FD">
+    android:background="@color/arg_celeste_surface">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Hoy gastaste"
-        android:textColor="#1565C0"
+        android:textColor="@color/arg_celeste_dark"
         android:textSize="12sp" />
 
     <TextView
@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="—"
-        android:textColor="#0D47A1"
+        android:textColor="@color/arg_ink"
         android:textSize="22sp"
         android:textStyle="bold" />
 
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:text=""
-        android:textColor="#1565C0"
+        android:textColor="@color/arg_celeste_dark"
         android:textSize="12sp" />
 
     <Button
@@ -38,4 +38,5 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="➕ Cargar gasto" />
+
 </LinearLayout>

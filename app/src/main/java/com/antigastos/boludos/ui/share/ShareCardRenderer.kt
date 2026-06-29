@@ -13,6 +13,7 @@ import android.graphics.Typeface
 import androidx.core.content.FileProvider
 import com.antigastos.boludos.domain.CopyMood
 import com.antigastos.boludos.domain.MoneyFormat
+import com.antigastos.boludos.ui.theme.ArgPalette
 import java.io.File
 import java.io.FileOutputStream
 
@@ -126,8 +127,8 @@ object ShareCardRenderer {
         val bg = Paint().apply { shader = grad }
         canvas.drawRect(0f, 0f, size.toFloat(), size.toFloat(), bg)
 
-        val flagBlue = Color.parseColor("#74ACDF")
-        val flagYellow = Color.parseColor("#F6B40E")
+        val flagBlue = Color.parseColor(ArgPalette.CelesteHex)
+        val flagYellow = Color.parseColor(ArgPalette.SunHex)
         val barH = 18f
         canvas.drawRect(0f, 0f, size.toFloat(), barH, Paint().apply { color = flagBlue })
         canvas.drawRect(0f, size - barH, size.toFloat(), size.toFloat(), Paint().apply { color = flagYellow })
@@ -168,8 +169,8 @@ object ShareCardRenderer {
         )
         canvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), Paint().apply { shader = grad })
 
-        val flagBlue = Color.parseColor("#74ACDF")
-        val flagYellow = Color.parseColor("#F6B40E")
+        val flagBlue = Color.parseColor(ArgPalette.CelesteHex)
+        val flagYellow = Color.parseColor(ArgPalette.SunHex)
         val barH = 22f
         canvas.drawRect(0f, 0f, w.toFloat(), barH, Paint().apply { color = flagBlue })
         canvas.drawRect(0f, h - barH, w.toFloat(), h.toFloat(), Paint().apply { color = flagYellow })
@@ -232,8 +233,8 @@ object ShareCardRenderer {
         )
         canvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), Paint().apply { shader = grad })
 
-        val flagBlue = Color.parseColor("#74ACDF")
-        val flagYellow = Color.parseColor("#F6B40E")
+        val flagBlue = Color.parseColor(ArgPalette.CelesteHex)
+        val flagYellow = Color.parseColor(ArgPalette.SunHex)
         val barH = 22f
         canvas.drawRect(0f, 0f, w.toFloat(), barH, Paint().apply { color = flagBlue })
         canvas.drawRect(0f, h - barH, w.toFloat(), h.toFloat(), Paint().apply { color = flagYellow })

@@ -1,5 +1,6 @@
 package com.antigastos.boludos.ui.theme
 
+import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -8,17 +9,12 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-
-private val ArgCeleste = Color(0xFF74ACDF)
-private val ArgCelesteDark = Color(0xFF1F4E8A)
-private val ArgSunYellow = Color(0xFFF6B40E)
-private val ArgInk = Color(0xFF0F1B2D)
-private val ArgWhite = Color(0xFFFFFFFF)
-private val ArgPaper = Color(0xFFF7FBFF)
-private val ArgNight = Color(0xFF0B1220)
-private val ArgSurfaceDark = Color(0xFF11192A)
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
 private val ChampGold = Color(0xFFC9A227)
 private val ChampGoldDark = Color(0xFF8B6914)
@@ -28,22 +24,24 @@ private val ChampNight = Color(0xFF120D05)
 private val ChampSurfaceDark = Color(0xFF1C1508)
 
 private val LightColors = lightColorScheme(
-    primary = ArgCeleste,
-    onPrimary = ArgInk,
-    primaryContainer = Color(0xFFD6E8F7),
-    onPrimaryContainer = ArgInk,
-    secondary = ArgSunYellow,
-    onSecondary = ArgInk,
-    secondaryContainer = Color(0xFFFFE6A6),
-    onSecondaryContainer = ArgInk,
-    tertiary = ArgCelesteDark,
-    onTertiary = ArgWhite,
-    background = ArgPaper,
-    onBackground = ArgInk,
-    surface = ArgWhite,
-    onSurface = ArgInk,
-    surfaceVariant = Color(0xFFE3EDF7),
-    onSurfaceVariant = Color(0xFF263240),
+    primary = ArgPalette.Celeste,
+    onPrimary = ArgPalette.Ink,
+    primaryContainer = ArgPalette.CelesteContainer,
+    onPrimaryContainer = ArgPalette.Ink,
+    secondary = ArgPalette.Sun,
+    onSecondary = ArgPalette.Ink,
+    secondaryContainer = ArgPalette.SunLight,
+    onSecondaryContainer = ArgPalette.Ink,
+    tertiary = ArgPalette.CelesteDark,
+    onTertiary = ArgPalette.White,
+    background = ArgPalette.CelestePaper,
+    onBackground = ArgPalette.Ink,
+    surface = ArgPalette.White,
+    onSurface = ArgPalette.Ink,
+    surfaceVariant = ArgPalette.CelesteSurface,
+    onSurfaceVariant = ArgPalette.InkMuted,
+    outline = ArgPalette.Celeste,
+    outlineVariant = ArgPalette.CelesteContainer,
 )
 
 private val LightChampionColors = lightColorScheme(
@@ -66,17 +64,22 @@ private val LightChampionColors = lightColorScheme(
 )
 
 private val DarkColors = darkColorScheme(
-    primary = ArgCeleste,
-    onPrimary = ArgInk,
-    primaryContainer = ArgCelesteDark,
-    onPrimaryContainer = ArgWhite,
-    secondary = ArgSunYellow,
-    onSecondary = ArgInk,
-    tertiary = Color(0xFF9CC9F0),
-    background = ArgNight,
-    onBackground = ArgWhite,
-    surface = ArgSurfaceDark,
-    onSurface = ArgWhite,
+    primary = ArgPalette.Celeste,
+    onPrimary = ArgPalette.Ink,
+    primaryContainer = ArgPalette.CelesteDark,
+    onPrimaryContainer = ArgPalette.White,
+    secondary = ArgPalette.Sun,
+    onSecondary = ArgPalette.Ink,
+    secondaryContainer = Color(0xFF5C4A00),
+    onSecondaryContainer = ArgPalette.SunLight,
+    tertiary = ArgPalette.CelesteLight,
+    onTertiary = ArgPalette.Ink,
+    background = ArgPalette.Night,
+    onBackground = ArgPalette.White,
+    surface = ArgPalette.SurfaceDark,
+    onSurface = ArgPalette.White,
+    surfaceVariant = Color(0xFF1A2840),
+    onSurfaceVariant = ArgPalette.CelesteLight,
 )
 
 private val DarkChampionColors = darkColorScheme(
@@ -110,6 +113,19 @@ fun AntiGastosTheme(
         }
         darkTheme -> DarkColors
         else -> LightColors
+    }
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colors.primary.toArgb()
+            window.navigationBarColor = colors.background.toArgb()
+            WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars = !darkTheme && !championTheme
+                isAppearanceLightNavigationBars = !darkTheme && !championTheme
+            }
+        }
     }
 
     MaterialTheme(
